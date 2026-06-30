@@ -1,36 +1,58 @@
 def decide(detections):
     """
     Stage 5:
-    Make the final decision based on detected objects.
-
-    Returns:
-        decision_text
+    Generate final report.
     """
 
-    total_objects = len(detections)
+    total = len(detections)
 
-    small_objects = 0
-    large_objects = 0
+    red = 0
+    green = 0
+    blue = 0
 
-    AREA_THRESHOLD = 5000
+    small = 0
+    large = 0
+
+    report = []
+
+    report.append("===== OBJECT SORTING REPORT =====")
+    report.append("")
 
     for obj in detections:
-        if obj["area"] < AREA_THRESHOLD:
-            small_objects += 1
+
+        report.append(
+            f"Object {obj['id']}: {obj['color']} | {obj['size']}"
+        )
+
+        if obj["color"] == "Red":
+            red += 1
+
+        elif obj["color"] == "Green":
+            green += 1
+
+        elif obj["color"] == "Blue":
+            blue += 1
+
+        if obj["size"] == "Small":
+            small += 1
         else:
-            large_objects += 1
+            large += 1
 
-    decision = []
+    report.append("")
+    report.append("----------------------------")
+    report.append(f"Total objects : {total}")
+    report.append("")
+    report.append(f"Red objects   : {red}")
+    report.append(f"Green objects : {green}")
+    report.append(f"Blue objects  : {blue}")
+    report.append("")
+    report.append(f"Small objects : {small}")
+    report.append(f"Large objects : {large}")
+    report.append("")
 
-    decision.append("===== OBJECT SORTING REPORT =====")
-    decision.append(f"Total objects detected: {total_objects}")
-    decision.append(f"Small objects: {small_objects}")
-    decision.append(f"Large objects: {large_objects}")
-    decision.append("")
-
-    if total_objects == 0:
-        decision.append("Decision: No objects detected.")
+    if total == 0:
+        report.append("Decision: No objects detected.")
     else:
-        decision.append("Decision: Object sorting completed successfully.")
+        report.append("Decision: Object sorting completed successfully.")
 
-    return "\n".join(decision)
+    return "\n".join(report)
