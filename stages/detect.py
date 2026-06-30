@@ -1,17 +1,38 @@
 import cv2
+import numpy as np
+
+
+def get_color(hsv_pixel):
+    """
+    Detect object color from HSV pixel.
+    """
+
+    h, s, v = hsv_pixel
+
+    # Red
+    if (h <= 10 or h >= 170) and s > 60:
+        return "Red"
+
+    # Green
+    elif 35 <= h <= 90:
+        return "Green"
+
+    # Blue
+    elif 95 <= h <= 135:
+        return "Blue"
+
+    return "Unknown"
 
 
 def detect(mask, image):
     """
     Stage 4:
-    Detect objects using contours.
-
-    Returns:
-        image_with_boxes
-        detections
+    Detect objects and classify by color and size.
     """
 
     output = image.copy()
+
+    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
     contours, _ = cv2.findContours(
         mask,
@@ -27,7 +48,6 @@ def detect(mask, image):
 
         area = cv2.contourArea(contour)
 
-        # Ignore tiny objects
         if area < 300:
             continue
 
@@ -36,12 +56,14 @@ def detect(mask, image):
         cx = x + w // 2
         cy = y + h // 2
 
+        color = get_color(hsv[cy, cx])
+
+        size = "Large" if area >= 5000 else "Small"
+
         detections.append({
             "id": object_id,
-            "x": x,
-            "y": y,
-            "width": w,
-            "height": h,
+            "color": color,
+            "size": size,
             "area": area,
             "center": (cx, cy)
         })
@@ -55,22 +77,15 @@ def detect(mask, image):
             2
         )
 
-        # Draw center point
-        cv2.circle(
-            output,
-            (cx, cy),
-            4,
-            (0, 0, 255),
-            -1
-        )
+        # Draw label
+        label = f"{color} | {size}"
 
-        # Draw ID
         cv2.putText(
             output,
-            f"ID {object_id}",
+            label,
             (x, y - 10),
             cv2.FONT_HERSHEY_SIMPLEX,
-            0.6,
+            0.5,
             (255, 0, 0),
             2
         )
