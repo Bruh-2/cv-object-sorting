@@ -4,51 +4,44 @@ import numpy as np
 
 def segment(image):
     """
-    Stage 2: Segment colored objects using HSV.
-
-    Returns:
-        binary mask
+    Stage 2:
+    Segment colored objects.
     """
 
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
-    # ----- RED -----
+    color_ranges = [
 
-    lower_red1 = np.array([0, 80, 80])
-    upper_red1 = np.array([10, 255, 255])
+        # RED
+        ((0, 70, 50), (10, 255, 255)),
+        ((170, 70, 50), (180, 255, 255)),
 
-    lower_red2 = np.array([170, 80, 80])
-    upper_red2 = np.array([180, 255, 255])
+        # GREEN
+        ((35, 40, 40), (90, 255, 255)),
 
-    red1 = cv2.inRange(hsv, lower_red1, upper_red1)
-    red2 = cv2.inRange(hsv, lower_red2, upper_red2)
+        # BLUE
+        ((90, 40, 40), (135, 255, 255)),
 
-    red_mask = red1 + red2
+        # YELLOW
+        ((20, 40, 40), (35, 255, 255)),
 
-    # ----- GREEN -----
+        # ORANGE
+        ((10, 70, 70), (20, 255, 255)),
 
-    lower_green = np.array([35, 60, 60])
-    upper_green = np.array([90, 255, 255])
+        # PURPLE
+        ((135, 40, 40), (170, 255, 255))
+    ]
 
-    green_mask = cv2.inRange(
-        hsv,
-        lower_green,
-        upper_green
-    )
+    mask = np.zeros(hsv.shape[:2], dtype=np.uint8)
 
-    # ----- BLUE -----
+    for lower, upper in color_ranges:
 
-    lower_blue = np.array([95, 80, 80])
-    upper_blue = np.array([135, 255, 255])
+        lower = np.array(lower)
 
-    blue_mask = cv2.inRange(
-        hsv,
-        lower_blue,
-        upper_blue
-    )
+        upper = np.array(upper)
 
-    # Combine masks
+        current = cv2.inRange(hsv, lower, upper)
 
-    mask = red_mask | green_mask | blue_mask
+        mask = cv2.bitwise_or(mask, current)
 
     return mask
