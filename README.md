@@ -1,55 +1,42 @@
 # cv-object-sorting
 
 
-# Automatic Color & Size Object Sorting System
+# Automatic Object Sorting System
 
-## Computer Vision Team Project
+## Computer Vision Course Project
 
-This project implements a complete Computer Vision pipeline using OpenCV.
+This project implements a complete **Computer Vision pipeline** for automatic object detection and sorting based on **color** and **size**.
 
-Pipeline:
-
-Image
-↓
-
-Enhance
-
-↓
-
-Segment
-
-↓
-
-Clean
-
-↓
-
-Detect
-
-↓
-
-Decision
+The system processes input images automatically and saves the result of every processing stage.
 
 ---
 
-## Features
+# Pipeline
 
-- Image enhancement using CLAHE
-- HSV color segmentation
-- Morphological noise removal
-- Object detection using contours
-- Automatic decision generation
-- Saves every pipeline stage
+| Stage | Description | Key Methods |
+|------|-------------|-------------|
+| **Enhance** | Improves image quality before processing | Gaussian Blur, CLAHE |
+| **Segment** | Segments colored objects using HSV color space | HSV Conversion, Color Thresholding |
+| **Clean** | Removes noise from the binary mask | Morphological Opening, Dilation |
+| **Detect** | Detects object contours and classifies each object | Contour Detection, Bounding Boxes, Color Classification |
+| **Decide** | Generates the final automatic report | Object Counting, Size Classification, Decision Generation |
 
 ---
 
-## Project Structure
+# Project Structure
 
-```
+```text
 cv-object-sorting/
 │
 ├── data/
+│   ├── image1.jpg
+│   ├── image2.jpg
+│   └── image3.jpg
+│
 ├── output/
+│
+├── report/
+│
 ├── stages/
 │   ├── enhance.py
 │   ├── segment.py
@@ -59,12 +46,96 @@ cv-object-sorting/
 │
 ├── pipeline.py
 ├── requirements.txt
-└── README.md
+├── README.md
+└── .gitignore
 ```
 
 ---
 
-## Installation
+# Processing Workflow
+
+```
+Input Image
+      │
+      ▼
+ Enhance
+      │
+      ▼
+ Segment
+      │
+      ▼
+  Clean
+      │
+      ▼
+ Detect
+      │
+      ▼
+ Decide
+      │
+      ▼
+ Final Report
+```
+
+---
+
+# Supported Colors
+
+The system can classify the following object colors:
+
+- 🔴 Red
+- 🟢 Green
+- 🔵 Blue
+- 🟡 Yellow
+- 🟠 Orange
+- 🟣 Purple
+
+---
+
+# Object Classification
+
+For every detected object the system determines:
+
+- Color
+- Size (Small / Large)
+- Position
+- Bounding Box
+
+---
+
+# Output
+
+For every processed image the program saves:
+
+```text
+output/
+
+image/
+
+original.jpg
+
+enhanced.jpg
+
+mask.jpg
+
+clean_mask.jpg
+
+detection.jpg
+
+decision.txt
+```
+
+---
+
+# Technologies
+
+- Python 3
+- OpenCV
+- NumPy
+- Matplotlib
+
+---
+
+# Installation
 
 ```bash
 pip install -r requirements.txt
@@ -72,7 +143,7 @@ pip install -r requirements.txt
 
 ---
 
-## Run
+# Run
 
 ```bash
 python pipeline.py
@@ -80,21 +151,21 @@ python pipeline.py
 
 ---
 
-## Output
+# Example Output
 
-For every image the program saves:
+The program automatically:
 
-- original.jpg
-- enhanced.jpg
-- mask.jpg
-- clean_mask.jpg
-- detection.jpg
-- decision.txt
+- Enhances the input image
+- Segments colored objects
+- Removes image noise
+- Detects object contours
+- Classifies objects by color and size
+- Generates an automatic report
 
 ---
 
-## Technologies
+# Authors
 
-- Python
-- OpenCV
-- NumPy
+Computer Vision Course Project
+
+2025
