@@ -7,105 +7,133 @@ from stages.clean import clean
 from stages.detect import detect
 from stages.decide import decide
 
-
 INPUT_FOLDER = "data"
 OUTPUT_FOLDER = "output"
 
 
+def save_image(path, image):
+    """
+    Save image to disk.
+    """
+    cv2.imwrite(path, image)
+
+
 def process_image(image_path):
+    """
+    Process one image through the complete CV pipeline.
+    """
 
     image_name = os.path.splitext(os.path.basename(image_path))[0]
 
-    save_folder = os.path.join(OUTPUT_FOLDER, image_name)
-
-    os.makedirs(save_folder, exist_ok=True)
+    print(f"\nProcessing: {image_name}")
 
     image = cv2.imread(image_path)
 
     if image is None:
-        print(f"Cannot open {image_path}")
-        return
+        print(f"Error: Cannot read {image_path}")
+        return False
 
-    # Stage 1
+    output_dir = os.path.join(OUTPUT_FOLDER, image_name)
+    os.makedirs(output_dir, exist_ok=True)
+
+    # ==========================
+    # Stage 1 - Enhance
+    # ==========================
+
     enhanced = enhance(image)
 
-    # Stage 2
+    # ==========================
+    # Stage 2 - Segment
+    # ==========================
+
     mask = segment(enhanced)
 
-    # Stage 3
-    clean_mask = clean(mask)
+    # ==========================
+    # Stage 3 - Clean
+    # ==========================
 
-    # Stage 4
-    detection_image, detections = detect(clean_mask, enhanced)
+    cleaned = clean(mask)
 
-    # Stage 5
-    decision = decide(detections)
+    # ==========================
+    # Stage 4 - Detect
+    # ==========================
 
-    # Save images
+    detection_image, detections = detect(cleaned, enhanced)
 
-    cv2.imwrite(
-        os.path.join(save_folder, "original.jpg"),
-        image
-    )
+    # ==========================
+    # Stage 5 - Decision
+    # ==========================
 
-    cv2.imwrite(
-        os.path.join(save_folder, "enhanced.jpg"),
-        enhanced
-    )
+    report = decide(detections)
 
-    cv2.imwrite(
-        os.path.join(save_folder, "mask.jpg"),
-        mask
-    )
+    # ==========================
+    # Save Results
+    # ==========================
 
-    cv2.imwrite(
-        os.path.join(save_folder, "clean_mask.jpg"),
-        clean_mask
-    )
+    save_image(os.path.join(output_dir, "original.jpg"), image)
+    save_image(os.path.join(output_dir, "enhanced.jpg"), enhanced)
+    save_image(os.path.join(output_dir, "mask.jpg"), mask)
+    save_image(os.path.join(output_dir, "clean_mask.jpg"), cleaned)
+    save_image(os.path.join(output_dir, "detection.jpg"), detection_image)
 
-    cv2.imwrite(
-        os.path.join(save_folder, "detection.jpg"),
-        detection_image
-    )
+    report_path = os.path.join(output_dir, "decision.txt")
 
-    with open(
-        os.path.join(save_folder, "decision.txt"),
-        "w"
-    ) as f:
-        f.write(decision)
+    with open(report_path, "w", encoding="utf-8") as file:
+        file.write(report)
 
-    print("--------------------------------")
-    print(image_name)
-    print(decision)
-    print("--------------------------------")
+    print("✓ Enhancement completed")
+    print("✓ Segmentation completed")
+    print("✓ Cleaning completed")
+    print("✓ Detection completed")
+    print("✓ Decision completed")
+
+    print(f"Objects detected: {len(detections)}")
+
+    print(f"Results saved to: {output_dir}")
+
+    return True
 
 
 def main():
 
+    print("=" * 50)
+    print("Computer Vision Object Sorting System")
+    print("=" * 50)
+
     if not os.path.exists(INPUT_FOLDER):
-        print("Folder 'data' not found.")
+        print(f"Folder '{INPUT_FOLDER}' does not exist.")
         return
 
-    files = []
+    os.makedirs(OUTPUT_FOLDER, exist_ok=True)
+
+    image_files = []
 
     for file in os.listdir(INPUT_FOLDER):
 
-        if file.lower().endswith(
-            (".jpg", ".jpeg", ".png")
-        ):
-            files.append(file)
+        if file.lower().endswith((".jpg", ".jpeg", ".png")):
+            image_files.append(file)
 
-    if len(files) == 0:
-        print("No images found.")
+    if len(image_files) == 0:
+        print("No images found in data folder.")
         return
 
-    for file in files:
+    print(f"\nFound {len(image_files)} image(s).")
 
-        process_image(
-            os.path.join(INPUT_FOLDER, file)
-        )
+    success = 0
 
-    print("\nPipeline finished successfully.")
+    for image_file in image_files:
+
+        image_path = os.path.join(INPUT_FOLDER, image_file)
+
+        if process_image(image_path):
+            success += 1
+
+    print("\n" + "=" * 50)
+    print("Pipeline Finished")
+    print("=" * 50)
+
+    print(f"Processed images: {success}/{len(image_files)}")
+    print(f"Results folder: {OUTPUT_FOLDER}")
 
 
 if __name__ == "__main__":
