@@ -9,17 +9,23 @@ def get_color(hsv_pixel):
 
     h, s, v = hsv_pixel
 
-    # Red
     if (h <= 10 or h >= 170) and s > 60:
         return "Red"
 
-    # Green
+    elif 20 <= h <= 34:
+        return "Yellow"
+
+    elif 10 < h < 20:
+        return "Orange"
+
     elif 35 <= h <= 90:
         return "Green"
 
-    # Blue
-    elif 95 <= h <= 135:
+    elif 91 <= h <= 135:
         return "Blue"
+
+    elif 136 <= h <= 169:
+        return "Purple"
 
     return "Unknown"
 
